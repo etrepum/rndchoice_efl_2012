@@ -30,39 +30,39 @@
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .slide .deck-next, .csstransitions.csstransforms .deck-container:not(.deck-menu) > .slide .deck-after {
   visibility: visible;
-  -webkit-transform: translate3d(200%, 0, 0);
+  -webkit-transform: translate(200%, 0);
   -moz-transform: translate(200%, 0);
   -ms-transform: translate(200%, 0);
   -o-transform: translate(200%, 0);
-  transform: translate3d(200%, 0, 0);
+  transform: translate(200%, 0);
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-previous {
-  -webkit-transform: translate3d(-200%, 0, 0);
+  -webkit-transform: translate(-200%, 0);
   -moz-transform: translate(-200%, 0);
   -ms-transform: translate(-200%, 0);
   -o-transform: translate(-200%, 0);
-  transform: translate3d(-200%, 0, 0);
+  transform: translate(-200%, 0, 0);
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-before {
-  -webkit-transform: translate3d(-400%, 0, 0);
+  -webkit-transform: translate(-400%, 0);
   -moz-transform: translate(-400%, 0);
   -ms-transform: translate(-400%, 0);
   -o-transform: translate(-400%, 0);
-  transform: translate3d(-400%, 0, 0);
+  transform: translate(-400%, 0, 0);
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-next {
-  -webkit-transform: translate3d(200%, 0, 0);
+  -webkit-transform: translate(200%, 0);
   -moz-transform: translate(200%, 0);
   -ms-transform: translate(200%, 0);
   -o-transform: translate(200%, 0);
-  transform: translate3d(200%, 0, 0);
+  transform: translate(200%, 0);
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-after {
-  -webkit-transform: translate3d(400%, 0, 0);
+  -webkit-transform: translate(400%, 0);
   -moz-transform: translate(400%, 0);
   -ms-transform: translate(400%, 0);
   -o-transform: translate(400%, 0);
-  transform: translate3d(400%, 0, 0);
+  transform: translate(400%, 0);
 }
 .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-before .slide, .csstransitions.csstransforms .deck-container:not(.deck-menu) > .deck-previous .slide {
   visibility: visible;
