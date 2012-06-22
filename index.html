@@ -46,6 +46,8 @@
     #die-roll .demo p { font-size: 2em; }
     div.demo .nomargin { margin-bottom: 0em; line-height: 1.25; }
     div.demo .big { font-size: 3em; line-height: 1.25; }
+    tr.selected { background-color: #ffaaaa; }
+    td.selected { background-color: #cc6666; }
     </style>
 
 </head>
@@ -56,7 +58,7 @@
 <section class="slide" id="title-slide">
     <h1>Random Choice
         <p class="subtitle">(случайный выбор)</p>
-        <p class="subtitle">Bob Ippolito</p>
+        <p class="subtitle">Bob Ippolito (<a href="http://twitter.com/etrepum">@etrepum</a>)</p>
         <p class="subtitle">Erlang Factory Lite 2012, Moscow</p>
     </h1>
 </section>
@@ -69,6 +71,19 @@
         <li>Brain is based on Markov chains (Це́пь Ма́ркова)</li>
         <li>Random choice is essential to this and many other interesting applications</li>
     </ul>
+</section>
+
+<section class="slide" id="markov">
+    <h2>Andrey Andreyevich Markov</h2>
+    <h3>Андре́й Андре́евич Ма́рков</h3>
+    <!-- http://en.wikipedia.org/wiki/File:AAMarkov.jpg -->
+    <img src="img/AAMarkov.jpg" />
+</section>
+
+<section class="slide" id="markov-chain">
+    <h2>Markov chain</h2>
+    <!-- http://en.wikipedia.org/wiki/File:Markovkate_01.svg -->
+    <img src="img/Markovkate_01.svg"/>
 </section>
 
 <section class="slide" id="really">
@@ -196,6 +211,7 @@ weight_split(N, L, [H={K, W} | T], Acc) ->
         <li>With replacement, weight can be implemented simply</li>
         <li>Just add the item to the list multiple times</li>
         <li><tt>[a, a, a, b, c, d]</tt></li>
+        <li>50% <tt>a</tt>, ~16.6% <tt>b</tt>, …</tt>
     </ul>
 </section>
 
@@ -208,6 +224,107 @@ weight_split(N, L, [H={K, W} | T], Acc) ->
         <h3 class="nomargin">L = </h3>
         <span class="l big">&nbsp;</span>
     </div>
+</section>
+
+<section class="slide" id="weighted-selection-repl-2-notes">
+    <h2>Optimizing for memory</h2>
+    <ul>
+        <li>Naive solution uses a lot of memory</li>
+        <li>Can do better by counting each unique choice</li>
+        <li><tt>{6, [{a, 3}, {b, 1}, {c, 1}, {d, 1}]}</tt></li>
+        <li>Tradeoff - it's harder to seek to Nth choice</li>
+    </ul>
+</section>
+
+<section class="slide" id="alias-notes">
+    <h2>Alias method</h2>
+    <ul>
+        <li>Create N coins, one for each unique choice</li>
+        <li>Choose coin (by die roll), then flip weighted coin</li>
+        <li>Uses O(N) memory, has O(1) selection!</li>
+    </ul>
+</section>
+
+<section class="slide" id="alias">
+    <h2>Alias method</h2>
+    <div class="demo">
+        <div style="float: left">
+            <button>Choose</button>
+            <h3>Die: <span class="die"></span></h3>
+            <h3>Coin: <span class="coin"></span></h3>
+        </div>
+        <table style="float: right">
+            <thead>
+                <tr><th>head</th><th>tail</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><tt>a</tt> 1</td><td><tt>undefined</tt></td></tr>
+                <tr><td><tt>b</tt> ⅔</td><td><tt>a</tt> ⅓</td></tr>
+                <tr><td><tt>c</tt> ⅔</td><td><tt>a</tt> ⅓</td></tr>
+                <tr><td><tt>d</tt> ⅔</td><td><tt>a</tt> ⅓</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="slide" id="handling-updates">
+    <h2>Handling updates</h2>
+    <ul>
+        <li>For our IRC bot, the choices update for every word of text</li>
+        <li>Alias method is <tt>O(N)</tt> to update</li>
+        <li>High <tt>O(N)</tt> garbage, no sharing at all</li>
+    </ul>
+</section>
+
+<section class="slide" id="naive-tree-update">
+    <h2>Using a tree</h2>
+    <ul>
+        <li>Can build a tree for efficient updates</li>
+        <li>Fast <tt>O(log N)</tt> updates</li>
+        <li>Low <tt>O(log N)</tt> garbage, good sharing</li>
+        <li>Slow <tt>O(N)</tt> seeks, since sort is by key</li>
+    </ul>
+</section>
+
+<section class="slide" id="max-heap-notes">
+    <h2>Simple max heap</h2>
+    <ul>
+        <li>Seems to be a good compromise between speed and memory</li>
+        <li>Highest weights first</li>
+        <li>Highest weights are most likely to be updated</li>
+        <li>Worst case <tt>O(N)</tt> for every operation</li>
+        <li>But very good common case, near head of the list</li>
+    </ul>
+</section>
+
+<section class="slide" id="max-heap">
+    <h2>Simple max heap</h2>
+    <div class="demo">
+        <div style="float: left">
+            <button>Choose</button>
+            <form>
+                <input type="text" placeholder="Enter words" /><br />
+                <span class="big output"></span>
+            </form>
+        </div>
+        <table style="float: right">
+            <thead>
+                <tr><th>Key&nbsp;</th><th>Weight</th></tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="slide" id="info">
+    <h2>Questions?</h2>
+    <h3>Slides:<br/>
+        &nbsp;&nbsp;<a href="http://etrepum.github.com/rndchoice_efl_2012">etrepum.github.com/rndchoice_efl_2012</a></h3>
+    <h3>Code:<br/>
+        &nbsp;&nbsp;<a href="http://github.com/rndchoice_efl_2012">github.com/etrepum/rndchoice_efl_2012</a></h3>
+    <h3>Twitter:<br/>
+        &nbsp;&nbsp;<a href="http://twitter.com/etrepum">@etrepum</a></h3>
 </section>
 
 <!-- deck.navigation snippet -->
@@ -233,9 +350,8 @@ weight_split(N, L, [H={K, W} | T], Acc) ->
 <a href="." title="Permalink to this slide" class="deck-permalink">#</a>
 
 
-<!-- Grab CDN jQuery, with a protocol relative URL; fall back to local if offline -->
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
-<script>window.jQuery || document.write('<script src="imakewebthings-deck.js-9accb16/jquery-1.7.min.js"><\/script>')</script>
+<!-- jQuery -->
+<script src="imakewebthings-deck.js-9accb16/jquery-1.7.min.js"></script>
 
 <!-- Deck Core and extensions -->
 <script src="imakewebthings-deck.js-9accb16/core/deck.core.js"></script>
@@ -297,6 +413,70 @@ $(function() {
         $l.html('[' + lst.join(', ') + ']');
         $s.data('list', sel);
         $s.html('[' + sel.join(', ') + ']');
+    });
+    $("#alias div.demo").on('click', function (event) {
+        $(this).find('.selected').toggleClass('selected', false);
+        var $rows = $(this).find('tbody tr');
+        var die = Math.floor(Math.random() * $rows.length);
+        var coin = Math.random();
+        $(this).find("span.die").html(1 + die);
+        $(this).find("span.coin").html(coin);
+        var $die = $rows.eq(die);
+        $die.toggleClass('selected', true);
+        if (die == 0 || coin < 2.0/3.0) {
+            $die.find('td:eq(0)').toggleClass('selected', true);
+        } else {
+            $die.find('td:eq(1)').toggleClass('selected', true);
+        }
+    });
+    var heap = [];
+    var total = 0;
+    var handleInput = function (word) {
+        var count = 1;
+        total += 1;
+        for (var i = 0; i < heap.length; i++) {
+            if (heap[i][0] === word) {
+                count += heap[i][1];
+                heap.splice(i, 1);
+                break;
+            }
+        }
+        for (i = i - 1; i >= 0 && heap[i][1] <= count; i--) {
+        }
+        heap.splice(i + 1, 0, [word, count]);
+        var repl = function (str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/>/g, '&gt;')
+                .replace(/</g, '&lt;')
+                .replace(/"/g, '&quot;');
+        };
+        var fmt = function (elem) {
+            return '<tr><td>' + repl(elem[0]) + '</td><td>' + elem[1] + '</td></tr>';
+        };
+        $("#max-heap div.demo tbody").html(heap.map(fmt).join(''));
+    };
+    $("#max-heap div.demo form").on('submit', function (event) {
+        var $input = $(this).find('input');
+        $input.val().split(/\s+/).forEach(handleInput);
+        $input.val('');
+        return false;
+    });
+    $("#max-heap div.demo button").on('click', function (event) {
+        var n = 1 + Math.floor(Math.random() * total);
+        var $tbody = $("#max-heap div.demo table tbody");
+        $tbody.find('.selected').toggleClass('selected', false);
+        $rows = $tbody.find('tr');
+        var n1 = n;
+        for (var i = 0; i < heap.length; i++) {
+            $rows.eq(i).toggleClass('selected', true);
+            n1 -= heap[i][1];
+            if (n1 <= 0) {
+                $rows.eq(i).find('td').toggleClass('selected', true);
+                break;
+            }
+        }
+        return false;
     });
 
 });
