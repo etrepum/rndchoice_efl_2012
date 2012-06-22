@@ -23,56 +23,191 @@
     <link rel="stylesheet" href="imakewebthings-deck.js-9accb16/extensions/scale/deck.scale.css">
     
     <!-- Style theme. More available in /themes/style/ or create your own. -->
-    <link rel="stylesheet" href="imakewebthings-deck.js-9accb16/themes/style/web-2.0.css">
+    <link rel="stylesheet" href="imakewebthings-deck.js-9accb16/themes/style/swiss.css">
     
     <!-- Transition theme. More available in /themes/transition/ or create your own. -->
     <link rel="stylesheet" href="imakewebthings-deck.js-9accb16/themes/transition/horizontal-slide.css">
     
     <script src="imakewebthings-deck.js-9accb16/modernizr.custom.js"></script>
+    <style type="text/css">
+    .slide h1 > p.subtitle {
+        font-size: 0.25em;
+        font-weight: bold;
+        margin-bottom: .25em;
+        color: #888;
+    }
+    #fair-coin p.heads, #fair-coin p.tails {
+        display: none;
+    }
+    #fair-coin .demo.heads p.heads, #fair-coin .demo.tails p.tails {
+        display: block;
+    }
+    #fair-coin .demo p { font-size: 2em; }
+    #die-roll .demo p { font-size: 2em; }
+    div.demo .nomargin { margin-bottom: 0em; line-height: 1.25; }
+    div.demo .big { font-size: 3em; line-height: 1.25; }
+    </style>
+
 </head>
 
 <body class="deck-container">
 
 <!-- Begin slides -->
 <section class="slide" id="title-slide">
-    <h1>Random Choice</h1>
+    <h1>Random Choice
+        <p class="subtitle">(случайный выбор)</p>
+        <p class="subtitle">Bob Ippolito</p>
+        <p class="subtitle">Erlang Factory Lite 2012, Moscow</p>
+    </h1>
 </section>
 
-<section class="slide" id="how-to-overview">
-    <h2>How to Make a Deck</h2>
-    <ol>
-        <li>
-            <h3>Write Slides</h3>
-            <p>Slide content is simple&nbsp;HTML.</p>
-        </li>
-        <li>
-            <h3>Choose Themes</h3>
-            <p>One for slide styles and one for deck&nbsp;transitions.</p>
-        </li>
-        <li>
-            <h3>Include Extensions</h3>
-            <p>Add extra functionality to your deck, or leave it stripped&nbsp;down.</p>
-        </li>
-    </ol>
+<section class="slide" id="why-this-talk">
+    <h2>Why this talk?</h2>
+    <ul>
+        <li>I was rewriting an IRC bot</li>
+        <li>He "learns" how to chat</li>
+        <li>Brain is based on Markov chains (Це́пь Ма́ркова)</li>
+        <li>Random choice is essential to this and many other interesting applications</li>
+    </ul>
 </section>
 
-<section class="slide" id="markup">
-    <h2>The Markup</h2>
-    <p>Slides are just HTML elements with a class of <code>slide</code>.</p>
-    <pre><code>&lt;section class=&quot;slide&quot;&gt;
-   &lt;h2&gt;How to Make a Deck&lt;/h2&gt;
-   &lt;ol&gt;
-      &lt;li&gt;
-         &lt;h3&gt;Write Slides&lt;/h3&gt;
-         &lt;p&gt;Slide content is simple HTML.&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-         &lt;h3&gt;Choose Themes&lt;/h3&gt;
-         &lt;p&gt;One for slide styles and one for deck transitions.&lt;/p&gt;
-      &lt;/li&gt;
-      &hellip;
-   &lt;/ol&gt;
-&lt;/section&gt;</code></pre>
+<section class="slide" id="really">
+    <h2>Really?</h2>
+    <ul>
+        <li>(Most) ad servers also use random choice</li>
+        <li>Mochi Media built this kind of ad server in Erlang</li>
+        <li>Was fun to come up with an efficent way to do it</li>
+    </ul>
+</section>
+
+<section class="slide" id="random-module">
+    <h2>Erlang's <tt>random</tt> module</h2>
+    <ul>
+        <li>Wichmann-Hill AS183 algorithm from 1982</li>
+        <li>… designed for 16 bit computers with limited arithmetic</li>
+        <li>It has poor results and you probably shouldn't use it</li>
+        <li>Consider the <tt>crypto</tt> module, or a third party library</li>
+        <li>Despite this, I will use <tt>random</tt> for the examples</li>
+    </ul>
+</section>
+
+<section class="slide" id="fair-coin-code">
+    <h2>Fair coin</h2>
+    <ul>
+        <li><tt>uniform()</tt> returns a float <tt>0.0 ≤ X &lt; 1.0</tt></li>
+        <li>○ (heads) when <tt>X &lt; 0.5</tt>, ● (tails) otherwise</li>
+    </ul>
+</section>
+
+<section class="slide" id="fair-coin">
+    <h2>Fair coin</h2>
+    <div class="demo">
+        <button>Flip Coin</button>
+        <h3 class="nomargin">X = <span class="x">…</span></h3>
+        <p class="heads big">○ (heads), X &lt; 0.5</p>
+        <p class="tails big">● (tails), X ≥ 0.5</p>
+    </div>
+</section>
+
+<section class="slide" id="die-roll-code">
+    <h2>Die roll</h2>
+    <ul>
+        <li><tt>uniform(N)</tt> returns an integer <tt>1 ≤ X ≤ N</tt></li>
+        <li><tt>uniform(N) -> 1 + trunc(N * uniform()).</tt></li>
+    </ul>
+</section>
+
+<section class="slide" id="die-roll">
+    <h2>Die roll</h2>
+    <div class="demo">
+        <button>Roll Die</button>
+        <h3 class="nomargin">X = <span class="x">…</span></h3>
+        <span class="die big"></span>
+    </div>
+</section>
+
+<section class="slide" id="unweighted-selection-code">
+    <h2>Random selection without replacement</h2>
+    <pre><code>choose(L) ->
+  Nth = random:uniform(length(L)),
+  {H, [Choice | T]} = lists:split(Nth, L),
+  {Choice, H ++ T}.</code></pre>
+</section>
+
+<section class="slide" id="unweighted-selection">
+    <h2>Random selection without replacement</h2>
+    <div class="demo">
+        <button>Select</button>
+        <h3 class="nomargin">Selections = </h3>
+        <span class="selections big">&nbsp;</span>
+        <h3 class="nomargin">L = </h3>
+        <span class="l big">&nbsp;</span>
+    </div>
+</section>
+
+<section class="slide" id="unweighted-selection-notes">
+    <h2>Random selection without replacement</h2>
+    <ul>
+        <li>Can be used to shuffle a list (very slowly)</li>
+        <li>Or simulate a deck of cards</li>
+    </ul>
+</section>
+
+<section class="slide" id="weighted-selection">
+    <h2>Weighted selection without replacement</h2>
+    <ul>
+        <li><tt>{sum(Weight), [{Key, Weight}, …]}</tt></li>
+        <li><pre><code>weight_split(N, L) -> weight_split(N, L, []).
+weight_split(N, L, [H={K, W} | T], Acc) ->
+  case N - W of
+    N1 when N1 > 0 ->
+      weight_split(N1, T, [H | Acc]);
+    _ ->
+      {K, lists:reverse(Acc, T)}
+  end.</pre></code>
+    </ul>
+</section>
+
+<section class="slide" id="unweighted-selection-repl-notes">
+    <h2>Random selection with replacement</h2>
+    <pre><code>choose(L) ->
+  lists:nth(random:uniform(length(L)), L).
+    </code></pre>
+    <ul>
+        <li>Does not change list</li>
+        <li>Similar to rolling a die</li>
+    </ul>
+</section>
+
+<section class="slide" id="unweighted-selection-repl">
+    <h2>Random selection with replacement</h2>
+    <div class="demo selection-without-repl" data-initial='["☃", "♖", "♗", "☺", "✈", "☭"]'>
+        <button>Select</button>
+        <h3 class="nomargin">Selections = </h3>
+        <span class="selections big">&nbsp;</span>
+        <h3 class="nomargin">L = </h3>
+        <span class="l big">&nbsp;</span>
+    </div>
+</section>
+
+<section class="slide" id="weighted-selection-repl-1">
+    <h2>Weighted selection, naive</h2>
+    <ul>
+        <li>With replacement, weight can be implemented simply</li>
+        <li>Just add the item to the list multiple times</li>
+        <li><tt>[a, a, a, b, c, d]</tt></li>
+    </ul>
+</section>
+
+<section class="slide" id="weighted-selection-repl-1">
+    <h2>Weighted selection with replacement</h2>
+    <div class="demo selection-without-repl" data-initial='["☃", "☃", "☃", "☺", "✈", "☭"]'>
+        <button>Select</button>
+        <h3 class="nomargin">Selections = </h3>
+        <span class="selections big">&nbsp;</span>
+        <h3 class="nomargin">L = </h3>
+        <span class="l big">&nbsp;</span>
+    </div>
 </section>
 
 <!-- deck.navigation snippet -->
@@ -115,6 +250,55 @@
 <script>
 $(function() {
     $.deck('.slide');
+    $("#fair-coin .demo").on('click', function (event) {
+        var n = Math.random();
+        $(this).find("span.x").html(n);
+        $(this
+            ).toggleClass('heads', n < 0.5
+            ).toggleClass('tails', !(n < 0.5));
+        return false;
+    });
+    $("#die-roll .demo").on('click', function (event) {
+        var n = Math.floor(Math.random() * 6);
+        $(this).find("span.x").html(1 + n);
+        $(this).find("span.die").html(['⚀','⚁','⚂','⚃','⚄','⚅'][n]);
+        return false;
+    });
+    $("#unweighted-selection .demo").on('click', function (event) {
+        var $l = $(this).find('span.l');
+        var $s = $(this).find('span.selections');
+        var lst = $l.data('list');
+        var sel = $s.data('list');
+        if (lst === undefined || !lst.length) {
+            lst = ['☃', '♖', '♗', '☺', '✈', '☭'];
+            sel = [];
+        } else {
+            var n = Math.floor(Math.random() * lst.length);
+            sel = sel.concat(lst.splice(n, 1));
+        }
+        $l.data('list', lst);
+        $l.html('[' + lst.join(', ') + ']');
+        $s.data('list', sel);
+        $s.html('[' + sel.join(', ') + ']');
+    });
+    $("div.demo.selection-without-repl").on('click', function (event) {
+        var $l = $(this).find('span.l');
+        var $s = $(this).find('span.selections');
+        var lst = $l.data('list');
+        var sel = $s.data('list');
+        if (lst === undefined || !lst.length || sel.length > 9) {
+            lst = $(this).data('initial');
+            sel = [];
+        } else {
+            var n = Math.floor(Math.random() * lst.length);
+            sel.push(lst[n]);
+        }
+        $l.data('list', lst);
+        $l.html('[' + lst.join(', ') + ']');
+        $s.data('list', sel);
+        $s.html('[' + sel.join(', ') + ']');
+    });
+
 });
 </script>
 
