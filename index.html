@@ -163,6 +163,15 @@
   {Choice, H ++ T}.</code></pre>
 </section>
 
+<section class="slide" id="unweighted-selection-notes">
+    <h2>Random selection without replacement</h2>
+    <ul>
+        <li>Can be used to shuffle a list (very slowly)</li>
+        <li>Or simulate a deck of cards</li>
+        <li>Not used by our Markov model, but worthy of demonstration</li>
+    </ul>
+</section>
+
 <section class="slide" id="unweighted-selection">
     <h2>Random selection without replacement</h2>
     <div class="demo">
@@ -172,14 +181,6 @@
         <h3 class="nomargin">L = </h3>
         <span class="l big">&nbsp;</span>
     </div>
-</section>
-
-<section class="slide" id="unweighted-selection-notes">
-    <h2>Random selection without replacement</h2>
-    <ul>
-        <li>Can be used to shuffle a list (very slowly)</li>
-        <li>Or simulate a deck of cards</li>
-    </ul>
 </section>
 
 <section class="slide" id="weighted-selection">
@@ -210,7 +211,7 @@ weight_split(N, L, [H={K, W} | T], Acc) ->
 
 <section class="slide" id="unweighted-selection-repl">
     <h2>Random selection with replacement</h2>
-    <div class="demo selection-without-repl" data-initial='["☃", "♖", "♗", "☺", "✈", "☭"]'>
+    <div class="demo selection-with-repl" data-initial='["☃", "♖", "♗", "☺", "✈", "☭"]'>
         <button>Select</button>
         <h3 class="nomargin">Selections = </h3>
         <span class="selections big">&nbsp;</span>
@@ -231,7 +232,7 @@ weight_split(N, L, [H={K, W} | T], Acc) ->
 
 <section class="slide" id="weighted-selection-repl-1">
     <h2>Weighted selection with replacement</h2>
-    <div class="demo selection-without-repl" data-initial='["☃", "☃", "☃", "☺", "✈", "☭"]'>
+    <div class="demo selection-with-repl" data-initial='["☃", "☃", "☃", "☺", "✈", "☭"]'>
         <button>Select</button>
         <h3 class="nomargin">Selections = </h3>
         <span class="selections big">&nbsp;</span>
@@ -411,7 +412,7 @@ $(function() {
         $s.data('list', sel);
         $s.html('[' + sel.join(', ') + ']');
     });
-    $("div.demo.selection-without-repl").on('click', function (event) {
+    $("div.demo.selection-with-repl").on('click', function (event) {
         var $l = $(this).find('span.l');
         var $s = $(this).find('span.selections');
         var lst = $l.data('list');
