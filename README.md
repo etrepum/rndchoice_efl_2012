@@ -11,3 +11,8 @@ Code:
 
 See also:
     http://github.com/etrepum/markov
+
+Some edits have been made to the slides since
+the talk was first presented. The version of the slides
+as presented can be seen here:
+    http://github.com/etrepum/rndchoice_efl_2012/tree/v1.0
