@@ -86,12 +86,24 @@
     <img src="img/Markovkate_01.svg"/>
 </section>
 
+<section class="slide" id="markov-chain-notes">
+    <h2>Markov text generator</h2>
+    <ul>
+        <li>Each step in a markov chain model makes a random choice</li>
+        <li>For the IRC bot, the number of word choices can be very large</li>
+        <li>Previous implementation was very simple, but too inefficient</li>
+        <li>Used too much memory, had to be retired years ago</li>
+    </ul>
+</section>
+
 <section class="slide" id="really">
     <h2>Really?</h2>
     <ul>
         <li>(Most) ad servers also use random choice</li>
         <li>Mochi Media built this kind of ad server in Erlang</li>
         <li>Was fun to come up with an efficent way to do it</li>
+        <li>Note that Markov models weren't used in our ad server</li>
+        <li>… but random choice is common to both</li>
     </ul>
 </section>
 
@@ -101,7 +113,8 @@
         <li>Wichmann-Hill AS183 algorithm from 1982</li>
         <li>… designed for 16 bit computers with limited arithmetic</li>
         <li>It has poor results and you probably shouldn't use it</li>
-        <li>Consider the <tt>crypto</tt> module, or a third party library</li>
+        <li>Consider the <tt>crypto</tt> module</li>
+        <li>… or a third party library (<a href="https://github.com/jj1bdx/sfmt-erlang">sfmt-erlang</a>)</li>
         <li>Despite this, I will use <tt>random</tt> for the examples</li>
     </ul>
 </section>
@@ -110,7 +123,8 @@
     <h2>Fair coin</h2>
     <ul>
         <li><tt>uniform()</tt> returns a float <tt>0.0 ≤ X &lt; 1.0</tt></li>
-        <li>○ (heads) when <tt>X &lt; 0.5</tt>, ● (tails) otherwise</li>
+        <li>○ (heads) when <tt>X &lt; 0.5</tt></li>
+        <li>● (tails) otherwise</li>
     </ul>
 </section>
 
